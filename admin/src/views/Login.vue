@@ -38,8 +38,8 @@ export default {
     return {
       logining: false,
       ruleForm: {
-        account: "admin",
-        checkPass: "123456"
+        account: '',
+        checkPass: ''
       },
       rules: {
         account: [
