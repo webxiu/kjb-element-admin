@@ -48,36 +48,60 @@ router.get('/order', function (req, res) {
 });
 
 //编辑订单
-router.post('/edit',(req, res) => {
-    let {w_id,w_username,w_phone,w_order_num,w_wl_status,w_address} = req.body;
+router.post('/edit', (req, res) => {
+    let { w_id, w_username, w_phone, w_order_num, w_wl_status, w_address } = req.body;
     //获取时间格式
-    let modifyTime = sd.format(new Date(),'YYYY-MM-DD HH:mm:ss')
+    let modifyTime = sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')
     let editSql = `update wn_order set w_username='${w_username}',w_phone='${w_phone}',w_order_num='${w_order_num}',w_wl_status='${w_wl_status}',w_address='${w_address}',w_import_date='${modifyTime}' where w_id=${w_id}`;
-    connection.query(editSql,(err,data) => {
-        if(err) throw err;
+    connection.query(editSql, (err, data) => {
+        if (err) throw err;
         res.json(data);
         console.log(data);
     })
 })
 
 //添加订单
-router.post('/add',(req,res) => {
-    let {w_username,w_phone,w_order_num,w_wl_status,w_address} = req.body;
-    let addTime = sd.format(new Date(),"YYYY-MM-DD HH:mm:ss")
+router.post('/add', (req, res) => {
+    let { w_username, w_phone, w_order_num, w_wl_status, w_address } = req.body;
+    let addTime = sd.format(new Date(), "YYYY-MM-DD HH:mm:ss")
     let addSql = `insert into wn_order (w_username,w_phone,w_order_num,w_wl_status,w_address,w_import_date) values('${w_username}','${w_phone}','${w_order_num}','${w_wl_status}','${w_address}','${addTime}')`;
-    connection.query(addSql,(err,data) => {
-        if(err) throw err;
+    connection.query(addSql, (err, data) => {
+        if (err) throw err;
         res.json(data)
     })
 
 })
 //删除订单
-router.post('/delete',(req,res) => {
-    let {deleteId} = req.body;
+router.post('/delete', (req, res) => {
+    let { deleteId } = req.body;
     let delSql = `delete FROM wn_order where w_id=${deleteId}`;
-    connection.query(delSql,(err,data) => {
-        if(err) throw err;
+    connection.query(delSql, (err, data) => {
+        if (err) throw err;
         res.json(data)
+    })
+
+})
+
+//点赞
+router.get('/praise', (req, res) => {
+    let { zan, date, id } = req.query;
+    let newTime = sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')
+    let zanQuery = `select w_praise,w_praise_date from wn_order where w_id='${id}'`;
+    let zanInsert = `update wn_order set w_praise='${++zan}',w_praise_date='${newTime}' where w_id='${id}'`
+    connection.query(zanQuery, (err, data) => {
+        if (err) throw err;
+        if (new Date(data[0].w_praise_date).toDateString() === new Date().toDateString()) {
+            // console.log('不能点赞了')
+            res.json({serverStatus:0,msg:'已经点过赞了'})
+        } else {
+            connection.query(zanInsert,(err, zan) => {
+                if (err) throw err;
+                console.log('赞成功')
+                res.json(zan);
+
+            })
+
+        }
     })
 
 })

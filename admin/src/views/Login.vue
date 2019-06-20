@@ -13,9 +13,9 @@
         <el-input type="text" v-model="ruleForm.account" auto-complete="off" placeholder="账号"></el-input>
       </el-form-item>
       <el-form-item prop="checkPass">
-        <el-input v-model="ruleForm.checkPass" auto-complete="off" placeholder="密码"></el-input>
+        <el-input type="password" v-model="ruleForm.checkPass" auto-complete="off" placeholder="密码"></el-input>
       </el-form-item>
-      <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
+      <el-checkbox v-model="checked" checked class="remember" @change="remember">记住帐号</el-checkbox>
       <el-form-item style="width:100%;">
         <el-button
           type="primary"
@@ -32,14 +32,16 @@
 <script>
 import NProgress from "nprogress";
 import { requestLogin } from "@/api/api";
+import md5 from "js-md5";
+import { cookies } from "@/utils/cookies.js";
 export default {
   name: "Login",
   data() {
     return {
       logining: false,
       ruleForm: {
-        account: '',
-        checkPass: ''
+        account: "",
+        checkPass: ""
       },
       rules: {
         account: [
@@ -49,7 +51,7 @@ export default {
         checkPass: [
           { required: true, message: "请输入密码", trigger: "blur" },
           { min: 5, max: 15, message: "长度在 5 到 15 个字符", trigger: "blur" }
-        ],
+        ]
         // age: [{ validator: checkAge, trigger: "blur" }]
       },
       checked: true
@@ -66,46 +68,62 @@ export default {
           let loginParam = {
             username: this.ruleForm.account,
             password: this.ruleForm.checkPass
-          }
+          };
           // console.log(loginParam)
           //提交数据
-          requestLogin(loginParam).then(data => {
-            this.logining = false;
-            NProgress.done();
-            let {password,username} = data[0];
-            console.log(loginParam.username,data[0]);
-            if(loginParam.username == username){
+          requestLogin(loginParam)
+            .then(data => {
+              this.logining = false;
+              NProgress.done();
+              let { password, username } = data[0];
+              console.log(loginParam.username, data[0]);
+              if (loginParam.username == username) {
+                this.$message({
+                  message: "登录成功!",
+                  type: "success"
+                });
+                //设置缓存
+                // this.$store.dispatch('userName',username)
+                // localStorage.setItem("user", username);
+                this.remember();
+                //跳转首页
+                this.$router.push({ path: "/home" });
+              } else {
+                this.logining = false;
+                this.$message({
+                  message: "登录失败!",
+                  type: "error"
+                });
+              }
+            })
+            .catch(err => {
+              NProgress.done();
+              this.logining = false;
               this.$message({
-                message:'登录成功!',
-                type:'success'
-              })
-              //设置缓存
-              // this.$store.dispatch('userName',username)
-              localStorage.setItem('user',username)
-              //跳转首页
-              this.$router.push({path:'/home'})
-            }else{
-            this.logining = false;
-              this.$message({
-                message:'登录失败!',
-                type:'error'
-              })
-            }
-          }).catch( err => {
-            NProgress.done();
-            this.logining = false;
-            this.$message({
-                message:'请检查用户名或密码是否正确!',
-                type:'error'
-              })
-            // console.log('失败',err)
-          })
-
+                message: "请检查用户名或密码是否正确!",
+                type: "error"
+              });
+              // console.log('失败',err)
+            });
         } else {
           console.log("error submit!!");
           return false;
         }
       });
+    },
+    // setCookie
+    remember() {
+      this.cookies.setCookie("cur_user", this.ruleForm.account, 1);//1天
+      // if (this.checked) {
+      //   cookies.setCookie("_gmtw_bln", md5(md5(this.ruleForm.checkPass)), 30);
+      // }
+      //   cookies.delCookie("_gmtw_bln");
+    }
+  },
+  mounted() {
+    if(this.cookies.getCookie("cur_user")){
+      this.ruleForm.account = this.cookies.getCookie("cur_user");
+      // this.ruleForm.checkPass = cookies.getCookie("_gmtw_bln");
     }
   }
 };

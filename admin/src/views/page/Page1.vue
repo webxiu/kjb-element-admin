@@ -84,6 +84,24 @@
           <span v-if="!isEdit[scope.$index]">{{scope.row.w_address}}</span>
         </template>
       </el-table-column>
+      <el-table-column label="点赞" prop="w_praise">
+        <template slot-scope="scope">
+          <el-input
+            type="textarea"
+            :rows="4"
+            v-if="isEdit[scope.$index]"
+            size="small"
+            v-model="scope.row.w_praise"
+            placeholder="请输入内容"
+            @change="handleEdit(scope.$index, scope.row)"
+          ></el-input>
+          <span
+            v-if="!isEdit[scope.$index]"
+            @click="handlePraise(scope.$index, scope.row)"
+            style="cursor: pointer;"
+          >{{scope.row.w_praise}}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="时间" prop="w_import_date"></el-table-column>
       <!-- <el-table-column label="修改时间" prop="w_modify_date"></el-table-column> -->
 
@@ -187,7 +205,8 @@ import {
   requestOrder,
   requestEdit,
   requestDelete,
-  requestAdd
+  requestAdd,
+  requestPraise
 } from "@/api/api";
 export default {
   data() {
@@ -206,7 +225,8 @@ export default {
       timer: null, // 搜索请求时间
       isEdit: [], // 是否编辑
       deleteId: "", // 删除ID
-      navs: [//导航菜单
+      navs: [
+        //导航菜单
         { title: "个人信息" },
         { title: "修改密码" },
         {
@@ -239,7 +259,11 @@ export default {
         ],
         w_order_num: [
           { required: true, message: "请输入订单号", trigger: "blur" },
-          { pattern:/^[a-zA-Z]{3,6}\d{10,15}$/,message:'以字母开头至少3-6位,以数字结尾至少10-15位' ,trigger: "blur" },
+          {
+            pattern: /^[a-zA-Z]{3,6}\d{10,15}$/,
+            message: "以字母开头至少3-6位,以数字结尾至少10-15位",
+            trigger: "blur"
+          }
         ],
         w_wl_status: [
           { required: true, message: "请输入状态", trigger: "blur" }
@@ -261,8 +285,7 @@ export default {
         w_order_num: "",
         w_wl_status: "",
         w_address: ""
-      },
-     
+      }
     };
   },
 
@@ -273,8 +296,8 @@ export default {
   },
   methods: {
     //刷新
-    on_refresh(){
-      alert('刷新')
+    on_refresh() {
+      alert("刷新");
     },
     //添加弹窗
     handleAdd() {
@@ -358,7 +381,7 @@ export default {
       this.timer = setTimeout(() => {
         this.getTableData();
         console.log("搜索", this.search);
-      },1000);
+      }, 1000);
     },
     //请求数据
     getTableData() {
@@ -393,6 +416,38 @@ export default {
           done();
         })
         .catch(_ => {});
+    },
+    //点赞
+    handlePraise(index, row) {
+      // console.log(index,row)
+      // var date = new Date("2019-6-20 16:07:59").getTime();
+      // if (new Date(date).toDateString() === new Date().toDateString()) {
+      //   console.log("你已经点赞过了");
+      // } else {
+      //   console.log("还可以以点");
+      // }
+
+      // 请求后台判断是否已经点过赞 当日点赞有效,点过需明天
+      requestPraise({
+        zan: row.w_praise,
+        date: row.w_praise_date,
+        id: row.w_id
+      }).then(res => {
+        if (res.serverStatus == 0) {
+          //已点过赞
+          this.$message({
+            message: res.msg,
+            type: "error"
+          });
+        } else if (res.serverStatus == 2) {
+          //没点过赞
+          this.getTableData(); //更新数据
+          this.$message({
+            message: "点赞成功",
+            type: "success"
+          });
+        }
+      });
     }
   }
 };
@@ -414,8 +469,8 @@ export default {
 .el-table__body .el-button + .el-button {
   margin-top: 10px;
 }
-.el-dialog{
-  min-width: 200px!important;
+.el-dialog {
+  min-width: 200px !important;
 }
 </style>
 

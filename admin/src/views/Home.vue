@@ -191,7 +191,9 @@ export default {
     },
     userName() {
       // return this.$store.state.usename; //刷新会消失
-      return localStorage.getItem("user");
+      // return localStorage.getItem("user");
+      return this.cookies.getCookie("cur_user");
+
     }
   },
   methods: {
@@ -206,11 +208,12 @@ export default {
     //退出
     loginOut() {
       if (confirm("确认退出吗?")) {
-        localStorage.removeItem("user");
+        // localStorage.removeItem("user");
+        // this.cookies.delCookie("cur_user")
         this.$router.push({ path: "/login" });
       }
     }
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>

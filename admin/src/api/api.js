@@ -11,3 +11,5 @@ export const requestEdit = params => { return axios.post(url.editFrom,params).th
 export const requestDelete = params => { return axios.post(url.deleteOrder,params).then(res => res.data); };
 //添加
 export const requestAdd = params => { return axios.post(url.addOrder,params).then(res => res.data); };
+//点赞
+export const requestPraise = param => { return axios.get(url.praise,{params:param}).then(res => res.data); };

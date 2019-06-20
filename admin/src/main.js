@@ -7,6 +7,7 @@ import Vuex from 'vuex'
 import axios from 'axios';
 import VueRouter from 'vue-router'
 import {store} from './store/store.js'
+import { cookies } from "@/utils/cookies.js";
 
 //引入elementUI
 import ElementUI from 'element-ui';
@@ -22,6 +23,7 @@ NProgress.configure({ easing: 'ease', speed: 500, showSpinner: false })
 
 Vue.prototype.$axios = axios;
 Vue.prototype.$echarts = echarts;
+Vue.prototype.cookies = cookies;
 
 Vue.use(Vuex)
 Vue.use(VueRouter)
@@ -36,10 +38,11 @@ const router = new VueRouter({
 router.beforeEach((to,from,next) => {
   NProgress.start();
   if(to.path == '/login'){
-    localStorage.removeItem('user')
+    // localStorage.removeItem('user')
+    next()
   }
 
-  let user = localStorage.getItem('user');
+  let user = cookies.getCookie("cur_user");
   if(!user && to.path != '/login'){
     next({path:'/login'})
   }else{
