@@ -86,24 +86,23 @@
       </el-table-column>
       <el-table-column label="点赞" prop="w_praise">
         <template slot-scope="scope">
-          <el-input
-            type="textarea"
-            :rows="4"
-            v-if="isEdit[scope.$index]"
-            size="small"
-            v-model="scope.row.w_praise"
-            placeholder="请输入内容"
-            @change="handleEdit(scope.$index, scope.row)"
-          ></el-input>
-          <span
-            v-if="!isEdit[scope.$index]"
-            @click="handlePraise(scope.$index, scope.row)"
-            style="cursor: pointer;"
-          >{{scope.row.w_praise}}</span>
+          <div @click="handlePraise(scope.$index, scope.row)" class="none-select">
+            
+            <i class="el-icon-thumb"></i>
+            <el-input
+              type="textarea"
+              :rows="4"
+              v-if="isEdit[scope.$index]"
+              size="small"
+              v-model="scope.row.w_praise"
+              placeholder="请输入内容"
+              @change="handleEdit(scope.$index, scope.row)"
+            ></el-input>
+            <span v-if="!isEdit[scope.$index]">{{scope.row.w_praise}}</span>
+          </div>
         </template>
       </el-table-column>
       <el-table-column label="时间" prop="w_import_date"></el-table-column>
-      <!-- <el-table-column label="修改时间" prop="w_modify_date"></el-table-column> -->
 
       <el-table-column align="right">
         <template slot="header" slot-scope="scope">
@@ -429,9 +428,10 @@ export default {
 
       // 请求后台判断是否已经点过赞 当日点赞有效,点过需明天
       requestPraise({
-        zan: row.w_praise,
-        date: row.w_praise_date,
-        id: row.w_id
+        theme: row.w_username,
+        zan_num: row.w_praise,
+        theme_id: row.w_id,
+        user_id: JSON.parse(this.cookies.getCookie("cur_user"))._handleid
       }).then(res => {
         if (res.serverStatus == 0) {
           //已点过赞
@@ -471,6 +471,16 @@ export default {
 }
 .el-dialog {
   min-width: 200px !important;
+}
+/* 禁止点赞选中文字 */
+.none-select {
+  cursor: pointer;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 </style>
 

@@ -33,7 +33,6 @@
 import NProgress from "nprogress";
 import { requestLogin } from "@/api/api";
 import md5 from "js-md5";
-import { cookies } from "@/utils/cookies.js";
 export default {
   name: "Login",
   data() {
@@ -41,7 +40,7 @@ export default {
       logining: false,
       ruleForm: {
         account: "",
-        checkPass: ""
+        checkPass: "123456"
       },
       rules: {
         account: [
@@ -75,17 +74,19 @@ export default {
             .then(data => {
               this.logining = false;
               NProgress.done();
-              let { password, username } = data[0];
+              let { id,password, username } = data[0];
               console.log(loginParam.username, data[0]);
               if (loginParam.username == username) {
                 this.$message({
                   message: "登录成功!",
                   type: "success"
                 });
+               
                 //设置缓存
                 // this.$store.dispatch('userName',username)
                 // localStorage.setItem("user", username);
-                this.remember();
+                let info = {_handleid:id,recod_user:username}
+                this.remember(info);
                 //跳转首页
                 this.$router.push({ path: "/home" });
               } else {
@@ -112,8 +113,9 @@ export default {
       });
     },
     // setCookie
-    remember() {
-      this.cookies.setCookie("cur_user", this.ruleForm.account, 1);//1天
+    remember(info) {
+      
+      this.cookies.setCookie("cur_user", JSON.stringify(info), 0.5);//半天
       // if (this.checked) {
       //   cookies.setCookie("_gmtw_bln", md5(md5(this.ruleForm.checkPass)), 30);
       // }
@@ -121,8 +123,10 @@ export default {
     }
   },
   mounted() {
+      console.log(999,this.cookies.getCookie("cur_user"))
+
     if(this.cookies.getCookie("cur_user")){
-      this.ruleForm.account = this.cookies.getCookie("cur_user");
+      this.ruleForm.account = JSON.parse(this.cookies.getCookie("cur_user")).recod_user;
       // this.ruleForm.checkPass = cookies.getCookie("_gmtw_bln");
     }
   }

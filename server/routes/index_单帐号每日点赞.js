@@ -84,28 +84,21 @@ router.post('/delete', (req, res) => {
 
 //点赞
 router.get('/praise', (req, res) => {
-    let { theme,zan_num,theme_id,user_id} = req.query;
+    let { zan, date, id } = req.query;
     let newTime = sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')
-    // console.log(66,theme,zan_num,theme_id,user_id)
-    //根据文章id和用户id查询是否有点赞记录
-    let zanQuery = `select * from k_praise where user_id='${user_id}' and theme_id='${theme_id}'`;
-    let zanInsert = `update wn_order set w_praise='${++zan_num}',w_praise_date='${newTime}' where w_id='${theme_id}'`
-    let zanUpdate = `insert into k_praise(theme_id, theme, user_id, status, date) values('${theme_id}','${theme}','${user_id}',1,'${newTime}')`
+    let zanQuery = `select w_praise,w_praise_date from wn_order where w_id='${id}'`;
+    let zanInsert = `update wn_order set w_praise='${++zan}',w_praise_date='${newTime}' where w_id='${id}'`
     connection.query(zanQuery, (err, data) => {
         if (err) throw err;
-        // 判断用户是否点过赞
-        if (data[0] && data[0].status == 1 && data[0].user_id == user_id) {
-            res.json({serverStatus:0,msg:'您已经点过赞了'})
+        if (new Date(data[0].w_praise_date).toDateString() === new Date().toDateString()) {
+            // console.log('不能点赞了')
+            res.json({serverStatus:0,msg:'今日已点过赞了'})
         } else {
-            // 更新点赞数量
-            connection.query(zanInsert,(err, add) => {
+            connection.query(zanInsert,(err, zan) => {
                 if (err) throw err;
-            })
-            // 储存点用户点赞记录(文章id和用户id...)
-            connection.query(zanUpdate,(err, zan) => {
-                if (err) throw err;
-                // console.log('赞成功2',JSON.stringify(zan))
+                console.log('赞成功')
                 res.json(zan);
+
             })
 
         }

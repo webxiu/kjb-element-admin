@@ -139,7 +139,7 @@ export default {
           menuIcon: "el-icon-message",
           menuList: [
             { menuItem: "个人管理", menuPage: "/page1" },
-            { menuItem: "新增用户", menuPage: "/page2" },
+            { menuItem: "签到管理", menuPage: "/page2" },
             { menuItem: "修改用户", menuPage: "/page3" },
             { menuItem: "删除用户" }
           ]
@@ -192,8 +192,8 @@ export default {
     userName() {
       // return this.$store.state.usename; //刷新会消失
       // return localStorage.getItem("user");
-      return this.cookies.getCookie("cur_user");
-
+      let user = JSON.parse(this.cookies.getCookie("cur_user"));
+      return user.recod_user;
     }
   },
   methods: {
