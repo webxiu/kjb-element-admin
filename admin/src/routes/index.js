@@ -6,56 +6,53 @@ import Home from '@/views/Home'
 import Page1 from '@/views/page/Page1'
 import Page2 from '@/views/page/Page2'
 import Page4 from '@/views/page/Page4'
+import Praise from '@/views/page/Praise'
 import Echarts from '@/views/echarts/Echarts'
-let  routes = [
-    {
-      path: '/',
-      name: '首页',
-      component: Home,
-      redirect:'/home'
-    },
-    {
-      path: '/login',
-      name: 'Login',
-      component: Login
-    },
-    {
-      path: '/home',
-      name: 'Home',
-      component: Home,
-      children:[
-        {
-          path: '/home',
-          name: 'home',
-          component: Page1
-        },
-        {
-          path: '/page1',
-          name: 'Page1',
-          component: Page1
-        },
-        {
-          path: '/page2',
-          name: 'Page2',
-          component: Page2
-        },
-        {
-          path: '/page3',
-          name: 'Page3',
-         component: () => import('@/views/page/Page3'),
-        },
-        {
-          path: '/page4',
-          name: 'Page4',
-          component: Page4
-        },
-        {
-          path: '/echarts',
-          name: 'Echarts',
-          component: Echarts
-        },
-      ]
-    },
-    
-  ]
+let routes = [
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
+  },
+  {
+    path: '/',
+    name: '首页',
+    component: Home,
+    redirect: '/page1',
+    children: [
+      {
+        path: '/page1',
+        name: '个人管理',
+        component: Page1
+      },
+      {
+        path: '/page2',
+        name: '签到管理',
+        component: Page2
+      },
+      {
+        path: '/page3',
+        name: '修改用户',
+        component: () => import('@/views/page/Page3'),
+      },
+      {
+        path: '/page4',
+        name: '签到测试',
+        component: Page4
+      },
+      {
+        path: '/praise',
+        name: '点赞状态',
+        component: Praise
+      },
+      {
+        path: '/echarts',
+        name: 'Echarts图表',
+        component: Echarts
+      },
+    ]
+  },
+  { path: '*', redirect: '/' }
+
+]
 export default routes;

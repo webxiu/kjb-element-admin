@@ -3,6 +3,8 @@ const router = express.Router();
 const mysql = require('mysql');
 //时间处理
 const sd = require('silly-datetime');
+//当前时期
+let currentTime = sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')
 
 let connection = mysql.createConnection({
     host: 'localhost',
@@ -12,7 +14,7 @@ let connection = mysql.createConnection({
 });
 
 //登录(单个查询)
-router.post('/api', (req, res) => {
+router.post('/login', (req, res) => {
     const { username, password } = req.body
     const sql = `select * from username where username='${username}' and password='${password}'`
     console.log('result:' + sql)
@@ -84,7 +86,7 @@ router.post('/delete', (req, res) => {
 
 //点赞
 router.get('/praise', (req, res) => {
-    let { theme,zan_num,theme_id,user_id} = req.query;
+    let { theme, zan_num, theme_id, user_id } = req.query;
     let newTime = sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')
     // console.log(66,theme,zan_num,theme_id,user_id)
     //根据文章id和用户id查询是否有点赞记录
@@ -95,14 +97,14 @@ router.get('/praise', (req, res) => {
         if (err) throw err;
         // 判断用户是否点过赞
         if (data[0] && data[0].status == 1 && data[0].user_id == user_id) {
-            res.json({serverStatus:0,msg:'您已经点过赞了'})
+            res.json({ serverStatus: 0, msg: '您已经点过赞了' })
         } else {
             // 更新点赞数量
-            connection.query(zanInsert,(err, add) => {
+            connection.query(zanInsert, (err, add) => {
                 if (err) throw err;
             })
             // 储存点用户点赞记录(文章id和用户id...)
-            connection.query(zanUpdate,(err, zan) => {
+            connection.query(zanUpdate, (err, zan) => {
                 if (err) throw err;
                 // console.log('赞成功2',JSON.stringify(zan))
                 res.json(zan);
@@ -111,6 +113,26 @@ router.get('/praise', (req, res) => {
         }
     })
 
+})
+//我的点赞
+router.get('/zan', (req, res) => {
+    let { user_id } = req.query;
+    let zanQuery = `select * from k_praise where user_id='${user_id}' order by id desc`;
+    connection.query(zanQuery, (err, zan) => {
+        if (err) throw err;
+        res.json(zan);
+    })
+})
+//签到
+router.get('/signin', (req, res) => {
+    let { user_id } = req.query;
+    console.log(currentTime,user_id);
+    
+    let signinQuery = `select * from k_signin where user_id='${user_id}' order by id desc`;
+    connection.query(signinQuery, (err, signin) => {
+        if (err) throw err;
+        res.json(signin);
+    })
 })
 
 // 创建连接池

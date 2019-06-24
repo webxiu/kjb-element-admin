@@ -13,3 +13,7 @@ export const requestDelete = params => { return axios.post(url.deleteOrder,param
 export const requestAdd = params => { return axios.post(url.addOrder,params).then(res => res.data); };
 //点赞
 export const requestPraise = param => { return axios.get(url.praise,{params:param}).then(res => res.data); };
+//我的点赞
+export const requestZan = param => { return axios.get(url.zan,{params:param}).then(res => res.data); };
+//签到
+export const requestSignin = param => { return axios.get(url.signin,{params:param}).then(res => res.data); };

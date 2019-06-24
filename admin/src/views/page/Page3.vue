@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h2>page3</h2>
     <el-table :data="tableData" tooltip-effect="dark" style="width: 100%" header-align="center">
       <el-table-column width="50" header-align="center">
         <template slot-scope="{row,$index}">

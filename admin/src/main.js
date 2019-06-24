@@ -6,7 +6,7 @@ import routes from './routes'
 import Vuex from 'vuex'
 import axios from 'axios';
 import VueRouter from 'vue-router'
-import {store} from './store/store.js'
+import { store } from './store/store.js'
 import { cookies } from "@/utils/cookies.js";
 
 //引入elementUI
@@ -32,22 +32,41 @@ Vue.config.productionTip = false
 
 const router = new VueRouter({
   routes,
-  mode:'history'
+  mode: 'history'
 })
 
-router.beforeEach((to,from,next) => {
+const routeList = [];
+
+router.beforeEach((to, from, next) => {
   NProgress.start();
-  if(to.path == '/login'){
+
+  if (to.path == '/login') {
     // localStorage.removeItem('user')
+    next()
+  } else {
+    //面包屑导航
+    var index = routeList.findIndex((val) => val.name == to.name);
+    if (index !== -1) {
+      //如果存在路由列表，则把之后的路由都删掉
+      // routeList.splice(index + 1, routeList.length - index - 1)
+      routeList.splice(index, 1)//删除前面的
+      routeList.push({ name: to.name, path: to.path })//push到后面
+    } else {
+      routeList.push({ name: to.name, path: to.path })
+    }
+    to.meta.routeList = routeList
     next()
   }
 
   let user = cookies.getCookie("cur_user");
-  if(!user && to.path != '/login'){
-    next({path:'/login'})
-  }else{
+  if (!user && to.path != '/login') {
+    next({ path: '/login' })
+  } else {
     next()
   }
+
+
+
 
 })
 

@@ -1,6 +1,6 @@
 <template>
   <div style="width:500px;margin:20px;">
-    <h2 class="cal_title">签到管理</h2>
+    <h2 class="cal_title" @click="report">签到管理</h2>
     <div class="calendar_box">
       <button class="month-less" @click="prevMonth"></button>
       <h4>{{year}}年{{month}}月{{clickDate?clickDate:date}}日</h4>
@@ -17,17 +17,24 @@
         </tr>
         <tr v-for="(day,index) in dataArr" :key="index">
           <td
-            v-for="(d,i) in day"
+            v-for="(data,i) in day"
             :key="i"
-            :class="{'cur_day':d == date}"
-            @click.prevent="getDate(d)"
-          >{{d}}</td>
+            :class="{'cur_day':data.d == date,'default_date':data.d == defaultActive && month==defaultMonth && year == defaultYear}"
+            @click.prevent="getDate(data.d)"
+            v-if="data.msg==1"
+          >{{data.d}}</td>
+          <td
+            v-else
+            :class="{ 'over':data.msg == 0 || data.msg == 2}"
+            @click.prevent="getMonth(data.d,data.msg)"
+          >{{data.d}}</td>
         </tr>
       </table>
     </div>
   </div>
 </template>
 <script>
+import { requestSignin } from "@/api/api";
 export default {
   data() {
     return {
@@ -37,6 +44,9 @@ export default {
       day: "",
       date: "",
       clickDate: "",
+      defaultActive:'',
+      defaultMonth:'',
+      defaultYear:'',
       dataArr: [],
       navs: [
         {
@@ -65,7 +75,8 @@ export default {
             { childItem: "已经处理" }
           ]
         }
-      ]
+      ],
+      checkIn: []
     };
   },
   created() {
@@ -134,23 +145,27 @@ export default {
       let pwdays = pdays - wd + 1;
       let arr = [];
       let tem = 0;
-      let mark = false; //避免空渲染
+      let mark = false; //避免多次渲染下月数据
       for (let i = 0; i < 6; i++) {
         arr[i] = new Array();
         for (let j = 0; j < 7; j++) {
           tem++;
           if (tem - wd > 0 && tem - wd <= len) {
-            arr[i][j] = tem - wd;
-            if (arr[i][j] >= len) mark = true;
+            arr[i][j] = { d: tem - wd, msg: 1 };
+            if (arr[i][j].d >= len) mark = true;
+
+            console.log(1111, tem, wd);
           } else {
-            // if (tem - wd <= 0) {
-            //   arr[i][j] = pwdays;
-            //   pwdays++;
-            // } else {
-            //   arr[i][j] = ndays;
-            //   ndays++;
-            // }
-            arr[i][j] = "";
+            if (tem - wd <= 0) {
+              arr[i][j] = { d: pwdays, msg: 0 };
+              pwdays++;
+              console.log(2222, tem, wd, arr[i][j]);
+            } else {
+              arr[i][j] = { d: ndays, msg: 2 };
+              ndays++;
+              console.log(3333, tem, wd, arr[i][j]);
+            }
+            // arr[i][j] = "";
           }
         }
         if (mark) break;
@@ -158,6 +173,8 @@ export default {
 
       this.dataArr = arr;
       console.log("结果", arr);
+      // 选中今天
+      this.checkDay();
     },
     nextMonth() {
       if (this.month == 12) {
@@ -181,6 +198,50 @@ export default {
     },
     getDate(d) {
       this.clickDate = d;
+    },
+    //点击那一天的
+    checkDay(){
+       let date = new Date();
+      //  let nowTime = new Date(date.getFullYear(),date.getMonth()+1,date.getDate()).toString();
+      //  let selTime = new Date(this.year,this.month,this.date).toString();
+      // console.log(8898,date.getDate());
+      //   this.defaultActive = true;
+      // }else{
+        this.defaultActive = date.getDate();
+        this.defaultMonth = date.getMonth()+1;
+        this.defaultYear = date.getFullYear();
+      // }
+    },
+    //遍历签到天数
+    isCheck(data) {
+      for (let key in this.checkIn) {
+        if (data == this.checkIn[key]) {
+          return true;
+        }
+        return false;
+      }
+    },
+    getMonth(day, msg) {
+      if (msg == 0) {
+        this.month--;
+        this.date = day;
+        this.getDate(day);
+        this.getCalendar();
+      }
+      if (msg == 2) {
+        this.month++;
+        this.date = day;
+        this.getDate(day);
+        this.getCalendar();
+      }
+    },
+    //点击签到
+    report() {
+      requestSignin({
+        user_id: JSON.parse(this.cookies.getCookie("cur_user"))._handleid
+      }).then(res => {
+        console.log(res);
+      });
     }
   }
 };
@@ -192,6 +253,7 @@ export default {
   border: 1px solid #e8e8e8;
   border-radius: 10px;
   text-align: center;
+  cursor: pointer;
 }
 .calendar {
   width: 100%;
@@ -202,6 +264,7 @@ export default {
 .cal_table {
   width: 100%;
   text-align: center;
+  border: 1px solid #e8e8e8;
 }
 
 .cal_table tr th {
@@ -218,19 +281,35 @@ export default {
   text-align: center;
   font-size: 22px;
   font-family: arial;
+  /* background: #000; */
 }
 .cal_table tr td:hover {
-  background: #f0f;
-  color: #564131;
+  background: #66b1ff;
+  color: #349c00;
   transition: all 0.5s;
 }
+.cal_table tr td.over {
+  background: #f3f3f3;
+  color: #c3c3c3;
+}
+/* 签到的图片 */
+.cal_table .ui-state-default {
+  background: url(../../assets/img/checkin.png) no-repeat center center;
+}
+/* 当前选择日期 */
 .cur_day {
-  background-color: #f60;
+  background: #f60;
   color: #fff;
 }
+/* 系统默认日期 */
+.default_date {
+  border: 1px dashed #f00;
+  background: #00f!important;
+}
+
 .except_day {
   background-color: #ddd;
-  color: #666;
+  color: #fb3838;
 }
 .calendar_box {
   color: #555;
@@ -251,6 +330,7 @@ export default {
   margin-bottom: 0px;
   padding: 12px 0;
 }
+/* 上一月/下一月 */
 .calendar_box button.month-less {
   left: 20px;
   background: url(../../assets/img/left-icon.png) no-repeat left -60px;

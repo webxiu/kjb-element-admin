@@ -71,6 +71,7 @@
     </aside>
 
     <el-container>
+      <!-- 头部 -->
       <el-header>
         <el-col :xs="18" :sm="18" :md="18" :lg="18">
           <div class="tools" @click.prevent="collapse">
@@ -112,6 +113,15 @@
           <span style="cursor:pointer;" @click="loginOut">[退出]</span>
         </el-col>
       </el-header>
+      <!-- 面包屑导航 -->
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item
+          v-for="(item,index) in routeList"
+          :key="index"
+          :to="{ path: item.path }"
+        >{{item.name}}
+        </el-breadcrumb-item>
+      </el-breadcrumb>
       <!-- 视图容器 -->
       <div style="height:100%;overflow-y:auto;position:relative">
         <router-view></router-view>
@@ -129,6 +139,7 @@ export default {
       address: "上海市普陀区金沙江路 156 弄"
     };
     return {
+      routeList: [],
       tableData: Array(20).fill(item),
       // username:'',
       collapsed: false,
@@ -141,7 +152,7 @@ export default {
             { menuItem: "个人管理", menuPage: "/page1" },
             { menuItem: "签到管理", menuPage: "/page2" },
             { menuItem: "修改用户", menuPage: "/page3" },
-            { menuItem: "删除用户" }
+            { menuItem: "我的点赞", menuPage: "/praise" }
           ]
         },
         {
@@ -158,7 +169,7 @@ export default {
           menuTitle: "图表查看",
           menuIcon: "el-icon-setting",
           menuList: [
-            { menuItem: "订单图表",menuPage:"/echarts" },
+            { menuItem: "订单图表", menuPage: "/echarts" },
             { menuItem: "其他图表" },
             { menuItem: "图表1" },
             { menuItem: "图表2" }
@@ -183,10 +194,15 @@ export default {
       // ]
     };
   },
-
+  watch: {
+    routeList() {
+      // this.routeList = this.$route.meta.routeList;
+    }
+  },
   computed: {
     //获取导航菜单数据
     getNavs() {
+      this.routeList = this.$route.meta.routeList;
       return this.$store.state.navs;
     },
     userName() {
@@ -212,8 +228,9 @@ export default {
         // this.cookies.delCookie("cur_user")
         this.$router.push({ path: "/login" });
       }
-    }
-  },
+    },
+   
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -323,13 +340,18 @@ export default {
   background: #eef1f6;
   color: #333;
 }
-// .el-menu-item{
-//     background: #bdb4b4 !important;
-//   color: #fff !important;
-//   border-right: 4px solid #8a7777;
-// }
- .el-menu-item:hover{
-   color:#8a7777;
+
+.el-menu-item:hover {
+  color: #8a7777;
   background: #dedede !important;
- }
+}
+// 面包屑导航
+.el-breadcrumb {
+  width: 100%;
+    height: 34px;
+    padding-left: 10px;
+    line-height: 34px;
+    background: #f7f7f7;
+    box-shadow: 1px 1px 2px #d8dce5;
+}
 </style>
