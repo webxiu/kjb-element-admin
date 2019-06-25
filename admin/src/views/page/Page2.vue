@@ -19,10 +19,12 @@
           <td
             v-for="(data,i) in day"
             :key="i"
-            :class="{'cur_day':data.d == date,'default_date':data.d == defaultActive && month==defaultMonth && year == defaultYear}"
+            :class="{'cur_day':data.d == date && !defaultYearMonth,'default_date': data.d == defaultToday && defaultYearMonth}"
             @click.prevent="getDate(data.d)"
             v-if="data.msg==1"
-          >{{data.d}}</td>
+          >{{data.d}}
+          <p v-if="isCheck(data)" class="ischecked">签</p>
+          </td>
           <td
             v-else
             :class="{ 'over':data.msg == 0 || data.msg == 2}"
@@ -43,10 +45,9 @@ export default {
       month: "",
       day: "",
       date: "",
-      clickDate: "",
-      defaultActive:'',
-      defaultMonth:'',
-      defaultYear:'',
+      clickDate: "",//点击更换日期
+      defaultToday:'',//默认今天
+      defaultYearMonth:'',//默认年月
       dataArr: [],
       navs: [
         {
@@ -76,7 +77,7 @@ export default {
           ]
         }
       ],
-      checkIn: []
+      checkIn: [1,9,12,20,28]
     };
   },
   created() {
@@ -205,12 +206,17 @@ export default {
       //  let nowTime = new Date(date.getFullYear(),date.getMonth()+1,date.getDate()).toString();
       //  let selTime = new Date(this.year,this.month,this.date).toString();
       // console.log(8898,date.getDate());
-      //   this.defaultActive = true;
+      //   this.defaultToday = true;
       // }else{
-        this.defaultActive = date.getDate();
-        this.defaultMonth = date.getMonth()+1;
-        this.defaultYear = date.getFullYear();
+       this.defaultToday = date.getDate();
+        let defaultMonth = date.getMonth()+1;
+        let defaultYear = date.getFullYear();
       // }
+      if(this.month==defaultMonth && this.year == defaultYear){
+        this.defaultYearMonth = true;
+      }else{
+         this.defaultYearMonth = false;
+      }
     },
     //遍历签到天数
     isCheck(data) {
@@ -275,13 +281,15 @@ export default {
   font-size: 22px;
 }
 .cal_table tr td {
-  border: 1px solid #e8e8e8;
-  height: 60px;
-  line-height: 60px;
-  text-align: center;
-  font-size: 22px;
-  font-family: arial;
-  /* background: #000; */
+      border: 1px solid #e8e8e8;
+    height: 60px;
+    /* line-height: 60px; */
+    text-align: center;
+    font-size: 22px;
+    font-family: arial;
+    position: relative;
+    /* background: #000; */
+    vertical-align: middle;
 }
 .cal_table tr td:hover {
   background: #66b1ff;
@@ -298,13 +306,14 @@ export default {
 }
 /* 当前选择日期 */
 .cur_day {
-  background: #f60;
+  background: #bda4b9;
   color: #fff;
 }
 /* 系统默认日期 */
 .default_date {
   border: 1px dashed #f00;
-  background: #00f!important;
+  color: #fff;
+  background: #f60;
 }
 
 .except_day {
@@ -330,6 +339,23 @@ export default {
   margin-bottom: 0px;
   padding: 12px 0;
 }
+/* 签到 */
+.ischecked{
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+    width: 18px;
+    height: 18px;
+    color: #fff;
+    background: #f43;
+    text-align: center;
+    line-height: 18px;
+    overflow: hidden;
+    font-size: 14px;
+    z-index: 22;
+}
+
 /* 上一月/下一月 */
 .calendar_box button.month-less {
   left: 20px;

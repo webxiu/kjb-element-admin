@@ -75,7 +75,6 @@ export default {
               this.logining = false;
               NProgress.done();
               let { id,password, username } = data[0];
-              console.log(loginParam.username, data[0]);
               if (loginParam.username == username) {
                 this.$message({
                   message: "登录成功!",
@@ -115,7 +114,7 @@ export default {
     // setCookie
     remember(info) {
       
-      this.cookies.setCookie("cur_user", JSON.stringify(info), 0.5);//半天
+      this.cookies.setCookie("cur_user", JSON.stringify(info), 1);//半天
       // if (this.checked) {
       //   cookies.setCookie("_gmtw_bln", md5(md5(this.ruleForm.checkPass)), 30);
       // }
