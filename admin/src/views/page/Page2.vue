@@ -203,11 +203,6 @@ export default {
     //点击那一天的
     checkDay(){
        let date = new Date();
-      //  let nowTime = new Date(date.getFullYear(),date.getMonth()+1,date.getDate()).toString();
-      //  let selTime = new Date(this.year,this.month,this.date).toString();
-      // console.log(8898,date.getDate());
-      //   this.defaultToday = true;
-      // }else{
        this.defaultToday = date.getDate();
         let defaultMonth = date.getMonth()+1;
         let defaultYear = date.getFullYear();
@@ -227,6 +222,7 @@ export default {
         return false;
       }
     },
+    //点击本月 上一月与下一月的灰色部分日期
     getMonth(day, msg) {
       if (msg == 0) {
         this.month--;
