@@ -19,7 +19,7 @@ export const store = new Vuex.Store({
         },
         setNav(state,navs){
             state.navs = navs
-            console.log(111,state.navs)
+            // console.log(111,state.navs)
         }
 
     },
