@@ -6,6 +6,7 @@ import Home from '@/views/Home'
 import Page1 from '@/views/page/Page1'
 import Page2 from '@/views/page/Page2'
 import Page4 from '@/views/page/Page4'
+import Test from '@/views/page/Test'
 import Praise from '@/views/page/Praise'
 import Echarts from '@/views/echarts/Echarts'
 let routes = [
@@ -39,6 +40,11 @@ let routes = [
         path: '/page4',
         name: '签到测试',
         component: Page4
+      },
+      {
+        path: '/test',
+        name: '测试',
+        component: Test
       },
       {
         path: '/praise',

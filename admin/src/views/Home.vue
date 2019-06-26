@@ -119,19 +119,29 @@
           v-for="(item,index) in routeList"
           :key="index"
           :to="{ path: item.path }"
-        >{{item.name}}
-        </el-breadcrumb-item>
+        >{{item.name}}</el-breadcrumb-item>
       </el-breadcrumb>
       <!-- 视图容器 -->
-      <div style="height:100%;overflow-y:auto;position:relative">
+      <div style="height:100%;overflow-y:auto;position:relative" class="showView">
         <router-view></router-view>
+        <!-- 右侧工具栏目 -->
+        <tools-panel>
+          <!-- <div slot="other">
+            <h1>插槽使用</h1>
+          </div>-->
+        </tools-panel>
       </div>
     </el-container>
   </el-container>
 </template>
 
 <script>
+import toolsPanel from "./page/toolsPanel";
 export default {
+  name: "Home",
+  components: {
+    toolsPanel
+  },
   data() {
     const item = {
       date: "2016-05-02",
@@ -139,6 +149,7 @@ export default {
       address: "上海市普陀区金沙江路 156 弄"
     };
     return {
+      color:'#409eff',
       routeList: [],
       tableData: Array(20).fill(item),
       // username:'',
@@ -159,7 +170,8 @@ export default {
           menuTitle: "订单管理",
           menuIcon: "el-icon-menu",
           menuList: [
-            { menuItem: "待处理订单", menuPage: "/page4" },
+            { menuItem: "eleUI日历", menuPage: "/page4" },
+            { menuItem: "测试页", menuPage: "/test" },
             { menuItem: "已处理订单" },
             { menuItem: "已经完成订单" },
             { menuItem: "未完成订单" }
@@ -228,8 +240,7 @@ export default {
         // this.cookies.delCookie("cur_user")
         this.$router.push({ path: "/login" });
       }
-    },
-   
+    }
   }
 };
 </script>
@@ -348,10 +359,12 @@ export default {
 // 面包屑导航
 .el-breadcrumb {
   width: 100%;
-    height: 34px;
-    padding-left: 10px;
-    line-height: 34px;
-    background: #f7f7f7;
-    box-shadow: 1px 1px 2px #d8dce5;
+  height: 34px;
+  padding-left: 10px;
+  line-height: 34px;
+  background: #f7f7f7;
+  box-shadow: 1px 1px 2px #d8dce5;
 }
+
+
 </style>

@@ -23,7 +23,7 @@
           <td
             v-for="(data,i) in day"
             :key="i"
-            :data="dataTime('-',data.d)"
+            :date="dataTime('-',data.d)"
             :class="{'cur_day':currentDay==data.d && defaultYearMonth,'default_date':!defaultYearMonth && data.d==date}"
             @click.prevent="getDate(data.d)"
             v-if="data.msg==1"
@@ -220,6 +220,8 @@ export default {
       // }
       if (this.month == defaultMonth && this.year == defaultYear) {
         this.defaultYearMonth = true;
+        //如果是本月默认显示当天
+        this.date = this.defaultToday;
       } else {
         this.defaultYearMonth = false;
       }

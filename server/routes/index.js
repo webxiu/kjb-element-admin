@@ -128,6 +128,7 @@ router.get('/signin', (req, res) => {
     let { user_id } = req.query;
     console.log(currentTime,user_id);
     
+    
     let signinQuery = `select * from k_signin where user_id='${user_id}' order by id desc`;
     connection.query(signinQuery, (err, signin) => {
         if (err) throw err;
