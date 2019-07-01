@@ -24,6 +24,44 @@ router.post('/login', (req, res) => {
         res.json(data)
     })
 })
+//添加登录日志
+router.post('/log', (req, res) => {
+    const {username, type,handleType,ip,typeID} = req.body;
+    let currentTime = sd.format(new Date(), 'YYYY-MM-DD HH:mm:ss')
+    
+    const sql = `insert into k_log (k_user,k_type,k_handleType,k_ip,k_date,k_typeId) values('${username}','${type}','${handleType}','${ip}','${currentTime}','${typeID?typeID:'-'}')`
+    // console.log('result:' + sql)
+    connection.query(sql, (err, data) => {
+        if (err) throw err;
+        res.json(data)
+    })
+})
+
+//获取日志数据
+router.get('/logs', function (req, res) {
+    let { page, size } = req.query;
+    let pageNum = (page - 1) * size;
+    let resultData = {}
+    
+    // 搜索+分页数据
+    const countSQL = `SELECT COUNT(*) as sum FROM k_log`;
+
+    const querySQL = `SELECT * FROM k_log WHERE 1=1 order by k_id desc LIMIT ${pageNum},${size}`;
+    connection.query(countSQL, function (err, data) {
+        if (err) throw err;
+        // console.log('数据' + JSON.stringify(result));
+        connection.query(querySQL, function (err, result) {
+            if (err) throw err;
+            console.log('num:' + data[0].sum);
+            resultData.count = data[0].sum
+            resultData.logInfo = result
+            res.json(resultData)
+        });
+    });
+
+});
+
+
 
 //首页订单
 router.get('/order', function (req, res) {

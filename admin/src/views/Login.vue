@@ -31,7 +31,7 @@
 
 <script>
 import NProgress from "nprogress";
-import { requestLogin } from "@/api/api";
+import { requestLogin, requestLog } from "@/api/api";
 import md5 from "js-md5";
 export default {
   name: "Login",
@@ -74,17 +74,30 @@ export default {
             .then(data => {
               this.logining = false;
               NProgress.done();
-              let { id,password, username } = data[0];
+              let { id, password, username, comment } = data[0];
+              // console.log(5550, data[0]);
+
               if (loginParam.username == username) {
                 this.$message({
                   message: "登录成功!",
                   type: "success"
                 });
-               
+
                 //设置缓存
                 // this.$store.dispatch('userName',username)
                 // localStorage.setItem("user", username);
-                let info = {_handleid:id,recod_user:username}
+                //设置日志,souhuIP
+                requestLog({
+                  username: username,
+                  type: "登录",
+                  handleType: comment, //操作类型(登录/增删改查)
+                  ip: returnCitySN['cip']+' '+returnCitySN['cname'],
+                }).then(res => {
+                  // console.log('登录日志',res)
+                });
+
+                //记住密码
+                let info = { _handleid: id, recod_user: username };
                 this.remember(info);
                 //跳转首页
                 this.$router.push({ path: "/home" });
@@ -113,8 +126,7 @@ export default {
     },
     // setCookie
     remember(info) {
-      
-      this.cookies.setCookie("cur_user", JSON.stringify(info), 1);//半天
+      this.cookies.setCookie("cur_user", JSON.stringify(info), 2); //半天
       // if (this.checked) {
       //   cookies.setCookie("_gmtw_bln", md5(md5(this.ruleForm.checkPass)), 30);
       // }
@@ -122,10 +134,12 @@ export default {
     }
   },
   mounted() {
-      console.log(999,this.cookies.getCookie("cur_user"))
+    // console.log('获取cookie',this.cookies.getCookie("cur_user"))
 
-    if(this.cookies.getCookie("cur_user")){
-      this.ruleForm.account = JSON.parse(this.cookies.getCookie("cur_user")).recod_user;
+    if (this.cookies.getCookie("cur_user")) {
+      this.ruleForm.account = JSON.parse(
+        this.cookies.getCookie("cur_user")
+      ).recod_user;
       // this.ruleForm.checkPass = cookies.getCookie("_gmtw_bln");
     }
   }

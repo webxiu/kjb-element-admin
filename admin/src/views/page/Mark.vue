@@ -46,6 +46,7 @@
 <script>
 import { requestSignin } from "@/api/api";
 export default {
+  name:"Mark",
   data() {
     return {
       today: new Date(),
@@ -152,7 +153,7 @@ export default {
       let pdays = new Date(this.year, this.month - 1, 0).getDate();
       // 获取每月第一天星期几
       let wd = new Date(this.year, this.month - 1, 1).getDay();
-      // console.log("星期", wd);
+      console.log("星期", wd);
       //下一月填空
       let ndays = 1;
       //上一月填空

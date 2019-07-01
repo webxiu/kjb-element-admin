@@ -121,6 +121,7 @@
           :to="{ path: item.path }"
         >{{item.name}}</el-breadcrumb-item>
       </el-breadcrumb>
+      <!-- <Breadcrumb /> -->
       <!-- 视图容器 -->
       <div style="height:100%;overflow-y:auto;position:relative" class="showView">
         <router-view></router-view>
@@ -137,10 +138,12 @@
 
 <script>
 import toolsPanel from "./page/toolsPanel";
+// import Breadcrumb from "./Breadcrumb";
 export default {
   name: "Home",
   components: {
-    toolsPanel
+    toolsPanel,
+    // Breadcrumb
   },
   data() {
     const item = {
@@ -160,9 +163,9 @@ export default {
 
           menuIcon: "el-icon-message",
           menuList: [
-            { menuItem: "个人管理", menuPage: "/page1" },
-            { menuItem: "签到管理", menuPage: "/page2" },
-            { menuItem: "修改用户", menuPage: "/page3" },
+            { menuItem: "个人管理", menuPage: "/table" },
+            { menuItem: "签到管理", menuPage: "/mark" },
+            { menuItem: "修改用户", menuPage: "/modify" },
             { menuItem: "我的点赞", menuPage: "/praise" }
           ]
         },
@@ -170,10 +173,10 @@ export default {
           menuTitle: "订单管理",
           menuIcon: "el-icon-menu",
           menuList: [
-            { menuItem: "eleUI日历", menuPage: "/page4" },
+            { menuItem: "eleUI日历", menuPage: "/calendar" },
             { menuItem: "测试页", menuPage: "/test" },
-            { menuItem: "已处理订单" },
-            { menuItem: "已经完成订单" },
+            { menuItem: "审核提交", menuPage: "/audit" },
+            { menuItem: "标签页", menuPage: "/tabpage" },
             { menuItem: "未完成订单" }
           ]
         },
@@ -182,9 +185,9 @@ export default {
           menuIcon: "el-icon-setting",
           menuList: [
             { menuItem: "订单图表", menuPage: "/echarts" },
+            { menuItem: "操作日志", menuPage: "/logs" },
             { menuItem: "其他图表" },
             { menuItem: "图表1" },
-            { menuItem: "图表2" }
           ]
         }
       ],

@@ -2,13 +2,16 @@
 //异步加载组件
 // component: Login => require(['@/views/Login'],Login)
 const Login = () => import('@/views/Login')
-import Home from '@/views/Home'
-import Page1 from '@/views/page/Page1'
-import Page2 from '@/views/page/Page2'
-import Page4 from '@/views/page/Page4'
-import Test from '@/views/page/Test'
-import Praise from '@/views/page/Praise'
-import Echarts from '@/views/echarts/Echarts'
+import Home from '@/views/Home'             //主页
+import Table from '@/views/page/Table'      //表格
+import Mark from '@/views/page/Mark'        //签到
+import Calendar from '@/views/page/Calendar'//日历
+import Test from '@/views/page/Test'        //测试页
+import LoginLog from '@/views/page/LoginLog'//登录日志
+import TabPage from '@/views/page/TabPage'  //标签页
+import Praise from '@/views/page/Praise'    //点赞
+import Audit from '@/views/page/Audit'      //提交
+import Echarts from '@/views/echarts/Echarts' //Echarts
 let routes = [
   {
     path: '/login',
@@ -19,27 +22,27 @@ let routes = [
     path: '/',
     name: '首页',
     component: Home,
-    redirect: '/page1',
+    redirect: '/table',
     children: [
       {
-        path: '/page1',
+        path: '/table',
         name: '个人管理',
-        component: Page1
+        component: Table
       },
       {
-        path: '/page2',
+        path: '/mark',
         name: '签到管理',
-        component: Page2
+        component: Mark
       },
       {
-        path: '/page3',
+        path: '/modify',
         name: '修改用户',
-        component: () => import('@/views/page/Page3'),
+        component: () => import('@/views/page/Modify'),
       },
       {
-        path: '/page4',
-        name: '签到测试',
-        component: Page4
+        path: '/calendar',
+        name: 'eleUI日历',
+        component: Calendar
       },
       {
         path: '/test',
@@ -47,9 +50,24 @@ let routes = [
         component: Test
       },
       {
+        path: '/logs',
+        name: '操作日志',
+        component: LoginLog
+      },
+      {
         path: '/praise',
         name: '点赞状态',
         component: Praise
+      },
+      {
+        path: '/tabpage',
+        name: '标签页切换',
+        component: TabPage
+      },
+      {
+        path: '/audit',
+        name: '信息审核',
+        component: Audit
       },
       {
         path: '/echarts',

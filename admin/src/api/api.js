@@ -5,6 +5,10 @@ import * as url from './urlConfig'
 export const requestLogin = params => { return axios.post(url.login, params).then(res => res.data); };
 //获取
 export const requestOrder = param => { return axios.get(url.order, {params:param}).then(res => res.data); };
+//添加日志
+export const requestLog = params => { return axios.post(url.log, params).then(res => res.data); };
+//获取日志s
+export const requestLogs = param => { return axios.get(url.logs, {params:param}).then(res => res.data); };
 //编辑
 export const requestEdit = params => { return axios.post(url.editFrom,params).then(res => res.data); };
 //删除

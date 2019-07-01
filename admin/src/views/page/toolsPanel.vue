@@ -72,7 +72,7 @@ export default {
   cursor: pointer;
   color: #fff;
   line-height: 40px;
-  top: 250px;
+  top: 45%;
   background-color: rgb(24, 144, 255);
 }
 .handle-button i {

@@ -1,5 +1,28 @@
 <template>
   <section style="padding: 0 15px;">
+    <!-- 查询 -->
+    <el-form ref="form" :model="form" label-width="80px">
+      <el-form-item label="活动区域">
+        <el-select v-model="form.region" placeholder="请选择活动区域">
+          <el-option label="区域一" value="shanghai"></el-option>
+          <el-option label="区域二" value="beijing"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="活动时间">
+        <el-col :span="11">
+          <el-date-picker type="date" placeholder="选择日期" v-model="form.date1" style="width: 100%;"></el-date-picker>
+        </el-col>
+        <el-col class="line" :span="2">-</el-col>
+        <el-col :span="11">
+          <el-time-picker placeholder="选择时间" v-model="form.date2" style="width: 100%;"></el-time-picker>
+        </el-col>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button type="primary" @click="onSubmit">立即创建</el-button>
+        <el-button>取消</el-button>
+      </el-form-item>
+    </el-form>
     <!-- 表格头部 -->
     <div class="table-info clearfix">
       <span>用户表单</span>
@@ -22,6 +45,18 @@
       <!-- 选择框 -->
       <!-- <el-table-column type="selection" width="55"></el-table-column> -->
 
+      <el-table-column label="id" prop="w_id">
+        <template slot-scope="scope">
+          <el-input
+            v-if="isEdit[scope.$index]"
+            size="small"
+            v-model="scope.row.w_id"
+            placeholder="请输入内容"
+            @change="handleEdit(scope.$index, scope.row)"
+          ></el-input>
+          <span v-if="!isEdit[scope.$index]">{{scope.row.w_id}}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="用户名" prop="w_username">
         <template slot-scope="scope">
           <el-input
@@ -87,7 +122,6 @@
       <el-table-column label="点赞" prop="w_praise">
         <template slot-scope="scope">
           <div @click="handlePraise(scope.$index, scope.row)" class="none-select">
-            
             <i class="el-icon-thumb"></i>
             <el-input
               type="textarea"
@@ -205,7 +239,8 @@ import {
   requestEdit,
   requestDelete,
   requestAdd,
-  requestPraise
+  requestPraise,
+  requestLog
 } from "@/api/api";
 export default {
   data() {
@@ -223,7 +258,13 @@ export default {
       search: "", // 搜索内同
       timer: null, // 搜索请求时间
       isEdit: [], // 是否编辑
-      deleteId: "", // 删除ID
+      deleteItem: "", // 删除行
+      form: {
+        //活动
+        region: "",
+        date1: "",
+        date2: ""
+      },
       navs: [
         //导航菜单
         { title: "个人信息" },
@@ -271,6 +312,7 @@ export default {
       },
       //添加表单
       addForm: {
+        w_id: "",
         w_username: "",
         w_phone: "",
         w_order_num: "",
@@ -279,6 +321,7 @@ export default {
       },
       //编辑表单
       editForm: {
+        w_id: "",
         w_username: "",
         w_phone: "",
         w_order_num: "",
@@ -294,6 +337,10 @@ export default {
     this.getTableData();
   },
   methods: {
+    // 查询
+    onSubmit() {
+      console.log("submit!");
+    },
     //刷新
     on_refresh() {
       alert("刷新");
@@ -313,6 +360,17 @@ export default {
               this.dialogAdd = false;
               //更新数据
               this.getTableData();
+              //记录日志
+              requestLog({
+                username: JSON.parse(this.cookies.getCookie("cur_user"))
+                  .recod_user,
+                type: "添加",
+                handleType: "添加[ " + _this.addForm.w_username + " ]的订单", //操作类型(登录/增删改查)
+                ip: returnCitySN["cip"] + " " + returnCitySN["cname"],
+                typeID: _this.addForm.w_id
+              }).then(res => {
+                // console.log('添加日志',res)
+              });
             } else {
               this.$message({ message: "添加失败,请稍后再试!", type: "error" });
               this.dialogAdd = true;
@@ -347,6 +405,17 @@ export default {
               this.dialogEdit = false;
               //更新数据
               this.getTableData();
+              //记录日志
+              requestLog({
+                username: JSON.parse(_this.cookies.getCookie("cur_user"))
+                  .recod_user,
+                type: "修改",
+                handleType: "修改[ " + _this.editForm.w_username + " ]的订单", //操作类型(登录/增删改查)
+                ip: returnCitySN["cip"] + " " + returnCitySN["cname"],
+                typeID: _this.editForm.w_id
+              }).then(res => {
+                // console.log('修改日志',res)
+              });
             } else {
               _this.$message({ message: "操作失败", type: "error" });
             }
@@ -358,18 +427,30 @@ export default {
     // 删除
     handleDelete(index, row) {
       //删除索引
-      this.deleteId = row.w_id;
+      this.deleteItem = row;
       console.log(index, row);
       this.dialogDelete = true;
     },
     //删除操作
     deleteSubmit() {
-      requestDelete({ deleteId: this.deleteId }).then(res => {
+      let _this = this;
+      requestDelete({ deleteId: this.deleteItem.w_id }).then(res => {
         if (res.affectedRows) {
           this.$message({ message: "删除成功", type: "success" });
           this.dialogDelete = false;
           //更新数据
           this.getTableData();
+          //记录日志
+          requestLog({
+            username: JSON.parse(_this.cookies.getCookie("cur_user"))
+              .recod_user,
+            type: "删除",
+            handleType: "删除[ " + _this.deleteItem.w_username + " ]的订单", //操作类型(登录/增删改查)
+            ip: returnCitySN["cip"] + " " + returnCitySN["cname"],
+            typeID: _this.deleteItem.w_id
+          }).then(res => {
+            // console.log('删除结果',res)
+          });
         }
       });
     },
@@ -390,7 +471,7 @@ export default {
         size: this.size,
         search: this.search
       }).then(res => {
-        console.log("查询结果", res.userInfo);
+        // console.log("查询结果", res.userInfo);
         this.tableData = res.userInfo;
         this.total = res.count;
         this.loading = false;
@@ -418,6 +499,7 @@ export default {
     },
     //点赞
     handlePraise(index, row) {
+      let _this = this;
       // console.log(index,row)
       // var date = new Date("2019-6-20 16:07:59").getTime();
       // if (new Date(date).toDateString() === new Date().toDateString()) {
@@ -445,6 +527,18 @@ export default {
           this.$message({
             message: "点赞成功",
             type: "success"
+          });
+
+          //记录日志
+          requestLog({
+            username: JSON.parse(_this.cookies.getCookie("cur_user"))
+              .recod_user,
+            type: "点赞",
+            handleType: "点赞[ " + row.w_username + " ]的订单", //操作类型(登录/增删改查)
+            ip: returnCitySN["cip"] + " " + returnCitySN["cname"],
+            typeID: row.w_id
+          }).then(res => {
+            // console.log('点赞结果',res)
           });
         }
       });
