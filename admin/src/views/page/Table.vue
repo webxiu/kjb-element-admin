@@ -242,6 +242,7 @@ import {
   requestPraise,
   requestLog
 } from "@/api/api";
+import aaaa from "@/api/http";
 export default {
   data() {
     return {
